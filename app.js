@@ -1,7 +1,7 @@
-// 1. Environment Variables setup
+
 const path = require("path");
 if (process.env.NODE_ENV !== "production") {
-  // Path explicitly specify karein taaki .env load ho sake
+ 
   require("dotenv").config({ path: path.join(__dirname, ".env") });
 }
 
@@ -17,7 +17,7 @@ const ExpressError = require("./utils/ExpressError.js");
 const Listing = require("./models/listing.js");
 const Review = require("./models/review.js")
 
-// Routes Import
+
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
@@ -26,7 +26,7 @@ const adminRouter = require("./routes/admin.js");
 const app = express();
 const dbUrl = process.env.ATLASDB_URL;
 
-// Debugging ke liye check: Agar console me "Undefined" aaye toh .env load nahi ho raha
+
 console.log("Database URL Check:", dbUrl ? "Loaded" : "Undefined");
 
 if (!dbUrl) {
@@ -34,7 +34,7 @@ if (!dbUrl) {
   process.exit(1); 
 }
 
-// 3. Database Connection
+
 main().then(() => {
   console.log("Connected to MongoDB successfully");
 }).catch((err) => console.log("DB Connection Error:", err));
@@ -43,11 +43,16 @@ async function main() {
   await mongoose.connect(dbUrl);
 }
 
-// 4. Middlewares
+
+const allowedOrigin = process.env.NODE_ENV === "production" 
+    ? "https://wander-list-vw2z.vercel.app" 
+    : "http://localhost:5173";               
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: allowedOrigin,
   credentials: true
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
