@@ -24,6 +24,7 @@ const userRouter = require("./routes/user.js");
 const adminRouter = require("./routes/admin.js");
 
 const app = express();
+app.set('trust proxy', 1);
 const dbUrl = process.env.ATLASDB_URL;
 
 
@@ -72,13 +73,14 @@ const sessionOptions = {
   store,
   secret: process.env.SECRET || "mysupersecretcode",
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  proxy:true,
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
-    secure: process.env.NODE_ENV === "production",
+    sameSite: "none", 
+    secure: true,
   }
 };
 
