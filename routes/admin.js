@@ -23,6 +23,11 @@ router.get("/pending", isAdmin, async (req, res) => {
     res.json(pendingListings);
 });
 
+router.patch("/approve-all", isAdmin, async (req, res) => {
+    await Listing.updateMany({ status: "pending" }, { status: "approved" });
+    res.json({ success: true, message: "All Pending Listings Approved!" });
+});
+
 router.patch("/approve/:id", isAdmin, async (req, res) => {
     await Listing.findByIdAndUpdate(req.params.id, { status: "approved" });
     res.json({ success: true, message: "Listing Approved!" });

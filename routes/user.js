@@ -7,11 +7,23 @@ const { signup, login, logout } = require("../controllers/user.js");
 router.post("/signup", wrapAsync(signup));
 
 router.post("/login", 
-    passport.authenticate("local", { 
-        
-      
-    }), 
-    wrapAsync(login) 
+    (req, res, next) => {
+        passport.authenticate("local", (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!user) {
+                return res.status(401).json({ error: info.message || "Invalid username or password" });
+            }
+            req.logIn(user, (err) => {
+                if (err) {
+                    return next(err);
+                }
+                next();
+            });
+        })(req, res, next);
+    },
+    wrapAsync(login)
 );
 
 router.get("/logout", logout);

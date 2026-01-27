@@ -8,7 +8,25 @@ const listingSchema = new Schema({
   image: { url: String, filename: String },
   price: Number,
   location: String,
+  state: {
+    type: String,
+    index: true
+  },
   country: String,
+  rating: {
+    type: Number,
+    default: 0
+  },
+  likes: {
+    type: Number,
+    default: 0
+  },
+  likedBy: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ],
   reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
   owner: { type: Schema.Types.ObjectId, ref: "User" },
   geometry: {
@@ -16,9 +34,9 @@ const listingSchema = new Schema({
     coordinates: { type: [Number], required: true },
   },
   status: {
-      type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending" 
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending"
   }
 });
 
@@ -31,4 +49,4 @@ listingSchema.post("findOneAndDelete", async (listing) => {
 const Listing = mongoose.model('Listing', listingSchema);
 
 
-module.exports=Listing;
+module.exports = Listing;

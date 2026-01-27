@@ -7,7 +7,7 @@ module.exports.signup = async (req, res, next) => {
         const registeredUser = await User.register(newUser, password);
         req.login(registeredUser, (err) => {
             if (err) return next(err);
-            res.status(201).json({ message: "Welcome to Wanderlust!", user: registeredUser });
+            res.status(201).json({ message: "Welcome to Wanderlist!", user: registeredUser });
         });
     }
     catch (e) {
