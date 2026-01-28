@@ -1,7 +1,7 @@
 const Listing = require("../models/listing");
 
 module.exports.index = async (req, res) => {
-    const { state, page = 1, limit = 48 } = req.query;
+    const { state, page = 1, limit = 12 } = req.query;
 
     const filter = {
         $or: [
@@ -23,7 +23,8 @@ module.exports.index = async (req, res) => {
     }
 
     const allListings = await Listing.find(filter)
-        .sort({ likes: -1, _id: -1 }) 
+        .select("title image price location state country rating likes status")
+        .sort({ likes: -1, _id: -1 })
         .skip(skip)
         .limit(l);
 
@@ -51,7 +52,7 @@ module.exports.showListing = async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id).populate({
         path: "reviews",
-        
+
         match: { status: "approved" },
         populate: { path: "author" }
     })
@@ -73,7 +74,7 @@ module.exports.createListing = async (req, res) => {
     }
 
     if (!req.file) {
-        
+
         return res.status(400).json({ error: "Image upload is mandatory!" });
     }
 
@@ -90,7 +91,7 @@ module.exports.createListing = async (req, res) => {
         type: "Point",
         coordinates: (geoData && geoData.length)
             ? [parseFloat(geoData[0].lon), parseFloat(geoData[0].lat)]
-            : [0, 0] 
+            : [0, 0]
     };
 
     await newListing.save();

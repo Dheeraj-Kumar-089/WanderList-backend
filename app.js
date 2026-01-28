@@ -1,7 +1,7 @@
 
 const path = require("path");
 if (process.env.NODE_ENV !== "production") {
- 
+
   require("dotenv").config({ path: path.join(__dirname, ".env") });
 }
 
@@ -14,6 +14,7 @@ const session = require("express-session");
 const MongoStore = require('connect-mongo');
 const User = require("./models/user.js");
 const ExpressError = require("./utils/ExpressError.js");
+const compression = require("compression");
 
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
@@ -32,7 +33,7 @@ console.log("Database URL Check:", dbUrl ? "Loaded" : "Undefined");
 
 if (!dbUrl) {
   console.error("CRITICAL ERROR: ATLASDB_URL is not defined in your .env file!");
-  process.exit(1); 
+  process.exit(1);
 }
 
 
@@ -45,15 +46,16 @@ async function main() {
 }
 
 
-const allowedOrigin = process.env.NODE_ENV === "production" 
-    ? "https://wander-list-vw2z.vercel.app" 
-    : "http://localhost:5173";
-    
+const allowedOrigin = process.env.NODE_ENV === "production"
+  ? "https://wander-list-vw2z.vercel.app"
+  : "http://localhost:5173";
+
 app.use(cors({
   origin: allowedOrigin,
   credentials: true
 }));
 
+app.use(compression());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -74,7 +76,7 @@ const sessionOptions = {
   secret: process.env.SECRET || "mysupersecretcode",
   resave: false,
   saveUninitialized: false,
-  proxy:true,
+  proxy: true,
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -109,9 +111,9 @@ app.all("*", (req, res, next) => {
 
 app.use((err, req, res, next) => {
   let { statusCode = 500, message = "Something went wrong!" } = err;
-  res.status(statusCode).json({ 
+  res.status(statusCode).json({
     success: false,
-    error: message 
+    error: message
   });
 });
 
